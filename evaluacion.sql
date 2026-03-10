@@ -363,3 +363,36 @@ SELECT f.title
 	INNER JOIN category AS c
 		ON fc.category_id = c.category_id
     WHERE c.name = "Comedy" AND f.length > 180;
+    
+/* 25. BONUS Encuentra todos los actores que han actuado juntos en al menos una película. La consulta
+ debe mostrar el nombre y apellido de los actores y el número de películas en las que han actuado juntos. */
+ 
+ SELECT DISTINCT(film_id), COUNT(film_id)
+	FROM film_actor
+    GROUP BY film_id;
+ 
+SELECT actor.first_name, actor.last_name, film_id, COUNT(film_actor.film_id)
+	FROM actor
+    INNER JOIN film_actor
+		ON actor.actor_id = film_actor.actor_id
+	GROUP BY actor.first_name, actor.last_name, film_actor.film_id;
+ 
+ -- query final
+ 
+SELECT 
+    a1.first_name AS name1, 
+    a1.last_name AS last_name1,
+    a2.first_name AS name2, 
+    a2.last_name AS last_name2,
+    COUNT(*) AS Movies
+FROM film_actor AS fa1                                          -- Uno la tabla consigo misma por la pelicula
+INNER JOIN film_actor AS fa2 
+	ON fa1.film_id = fa2.film_id 
+	AND fa1.actor_id < fa2.actor_id                          -- Evito que el actor se empareje consigo mismo y evitamos duplicados por la comparacion de dos actores
+INNER JOIN actor AS a1 
+	ON fa1.actor_id = a1.actor_id
+INNER JOIN actor AS a2 
+	ON fa2.actor_id = a2.actor_id            -- Uno con la tabla actor para traer los nombres reales
+GROUP BY fa1.actor_id, fa2.actor_id
+HAVING Movies >= 1
+ORDER BY Movies DESC;
